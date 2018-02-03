@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,20 +16,16 @@ import java.util.List;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<Album> listDataHeader; // header titles
-    // child data in format of header title, child title
-    private HashMap<Album, List<Track>> listDataChild;
+    private List<Album> listData;
 
-    public ExpandableListAdapter(Context context, List<Album> listDataHeader,
-                                 HashMap<Album, List<Track>> listChildData) {
+    public ExpandableListAdapter(Context context, List<Album> listData) {
         this.context = context;
-        this.listDataHeader = listDataHeader;
-        this.listDataChild = listChildData;
+        this.listData = listData;
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
-        return this.listDataChild.get(listDataHeader.get(groupPosition)).get(childPosititon);
+        return this.listData.get(groupPosition).getTrackList().get(childPosititon);
     }
 
     @Override
@@ -56,17 +51,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this.listDataChild.get(listDataHeader.get(groupPosition)).size();
+        return this.listData.get(groupPosition).getTrackList().size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this.listDataHeader.get(groupPosition);
+        return this.listData.get(groupPosition);
     }
 
     @Override
     public int getGroupCount() {
-        return this.listDataHeader.size();
+        return this.listData.size();
     }
 
     @Override
