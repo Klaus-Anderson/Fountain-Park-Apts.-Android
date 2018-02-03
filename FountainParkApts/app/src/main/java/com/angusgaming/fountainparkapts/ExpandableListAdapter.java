@@ -24,8 +24,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosititon) {
-        return this.listData.get(groupPosition).getTrackList().get(childPosititon);
+    public Object getChild(int groupPosition, int childPosition) {
+        return this.listData.get(groupPosition).getTrackList().get(childPosition);
     }
 
     @Override
