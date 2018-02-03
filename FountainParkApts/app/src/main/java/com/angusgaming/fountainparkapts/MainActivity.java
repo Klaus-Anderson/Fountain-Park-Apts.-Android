@@ -13,8 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
-    ArrayList<Album> listDataHeader;
-    HashMap<Album, List<Track>> listDataChild;
+    ArrayList<Album> listData;
 
     Album sk, fpa, tmsiym;
 
@@ -31,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         // preparing list data
         prepareListData();
 
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(this, listData);
 
         // setting list adapter
         expListView.setAdapter(listAdapter);
@@ -76,16 +75,11 @@ public class MainActivity extends AppCompatActivity {
      * Preparing the list data
      */
     private void prepareListData() {
-        listDataHeader = new ArrayList<>();
-        listDataChild = new HashMap<>();
+        listData = new ArrayList<>();
 
-        // Adding child data
-        listDataHeader.add(sk);
-        listDataHeader.add(fpa);
-        listDataHeader.add(tmsiym);
+        listData.add(sk);
+        listData.add(fpa);
+        listData.add(tmsiym);
 
-        listDataChild.put(listDataHeader.get(0), listDataHeader.get(0).getTrackList()); // Header, Child data
-        listDataChild.put(listDataHeader.get(1), listDataHeader.get(1).getTrackList());
-        listDataChild.put(listDataHeader.get(2), listDataHeader.get(2).getTrackList());
     }
 }
