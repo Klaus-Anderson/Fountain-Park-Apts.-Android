@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import java.io.FileDescriptor;
 import java.util.List;
 
 /**
@@ -46,16 +45,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.track_item, null);
         }
 
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        AssetFileDescriptor afd= context.getResources()
-                .openRawResourceFd(listData.get(groupPosition).getTrackList().get(childPosition).getMediaPlayerDataSource());
-        mmr.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
-
-        String songName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        String songName = getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE, groupPosition, childPosition);
 
         TextView txtListChild = convertView.findViewById(R.id.track_name);
 
         txtListChild.setText(songName);
+
+        convertView.setOnClickListener(v -> listData.get(groupPosition).getTrackList()
+                .get(childPosition).getMediaPlayer().start());
+
         return convertView;
     }
 
@@ -88,18 +86,23 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.album_header, null);
         }
 
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        AssetFileDescriptor afd= context.getResources()
-                .openRawResourceFd(listData.get(groupPosition).getTrackList().get(0).getMediaPlayerDataSource());
-        mmr.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
-
-        String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+        String albumName = getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM, groupPosition, 0);
         TextView lblListHeader = convertView
                 .findViewById(R.id.album_track);
         lblListHeader.setText(albumName);
 
         return convertView;
     }
+
+    private String getMetaData(int metadataKey, int groupPosition, int childPosition) {
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        AssetFileDescriptor afd= context.getResources()
+                .openRawResourceFd(listData.get(groupPosition).getTrackList().get(childPosition).getMediaPlayerDataSource());
+        mmr.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+
+        return mmr.extractMetadata(metadataKey);
+    }
+
 
     @Override
     public boolean hasStableIds() {
