@@ -1,6 +1,5 @@
 package com.angusgaming.fountainparkapts;
 
-import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ExpandableListView;
@@ -38,14 +37,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void getMusic(){
         sk = new Album();
-        sk.setAlbumCover(R.drawable.sk2_cover);
+        sk.setAlbumCoverResInt(R.drawable.sk2_cover);
+        sk.setBandcampLink("https://fountainparkapts.bandcamp.com/album/sk-2");
 
         sk.addTrack(new Track(this, R.raw.one_one));
         sk.addTrack(new Track(this, R.raw.one_two));
         sk.addTrack(new Track(this, R.raw.one_three));
 
         fpa = new Album();
-        fpa.setAlbumCover(R.drawable.fpa_cover);
+        fpa.setAlbumCoverResInt(R.drawable.fpa_cover);
+        fpa.setBandcampLink("https://fountainparkapts.bandcamp.com/album/fountain-park-apts");
 
         fpa.addTrack(new Track(this, R.raw.two_one));
         fpa.addTrack(new Track(this, R.raw.two_two));
@@ -59,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
         fpa.addTrack(new Track(this, R.raw.two_ten));
 
         tmsiym = new Album();
-        tmsiym.setAlbumCover(R.drawable.tmsiym_cover);
+        tmsiym.setAlbumCoverResInt(R.drawable.tmsiym_cover);
+        tmsiym.setBandcampLink("https://fountainparkapts.bandcamp.com/album/the-morning-sky-is-yesterdays-mess");
+
         tmsiym.addTrack(new Track(this, R.raw.three_one));
         tmsiym.addTrack(new Track(this, R.raw.three_two));
         tmsiym.addTrack(new Track(this, R.raw.three_three));

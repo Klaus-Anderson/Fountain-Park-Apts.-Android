@@ -1,13 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/album_cover_imageview"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_centerVertical="true"/>
 
     <TextView
-        android:id="@+id/album_track"
+        android:id="@+id/album_title"
+        android:layout_width="wrap_content"
+        android:layout_height="90dp"
+        android:layout_toEndOf="@id/album_cover_imageview"
+        android:gravity="center_vertical"
+        android:textSize="22sp"
+        tools:text="Album Name"
+        android:layout_toRightOf="@id/album_cover_imageview"
+        android:layout_centerVertical="true"/>
+
+    <TextView
+        android:id="@+id/bandcamp_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Album Name"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:textColor="@color/blue"
+        android:text="Bandcamp"/>
 
-</LinearLayout>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

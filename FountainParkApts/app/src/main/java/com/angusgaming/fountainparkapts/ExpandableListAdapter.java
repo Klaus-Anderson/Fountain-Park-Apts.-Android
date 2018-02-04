@@ -1,11 +1,14 @@
 package com.angusgaming.fountainparkapts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -95,11 +98,22 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.album_header, null);
         }
 
+        TextView albumTitleTextView = convertView.findViewById(R.id.album_title);
+        TextView bandCampLink = convertView.findViewById(R.id.bandcamp_link);
+        ImageView imageView = convertView.findViewById(R.id.album_cover_imageview);
+
         String albumName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
                 listData.get(groupPosition).getTrackList().get(0).getMediaPlayerDataSource());
-        TextView lblListHeader = convertView
-                .findViewById(R.id.album_track);
-        lblListHeader.setText(albumName);
+
+        imageView.setImageDrawable(context.getResources().getDrawable(listData.get(groupPosition).getAlbumCoverResInt()));
+        albumTitleTextView.setText(albumName);
+
+        bandCampLink.setOnClickListener(v -> {
+            String url = listData.get(groupPosition).getBandcampLink();
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            context.startActivity(i);
+        });
 
         return convertView;
     }

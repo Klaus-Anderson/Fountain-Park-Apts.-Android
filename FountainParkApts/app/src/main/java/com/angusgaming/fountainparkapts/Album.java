@@ -11,6 +11,7 @@ public class Album {
 
     private List<Track> trackList;
     private int albumCoverResInt;
+    private String bandcampLink;
 
     public Album(){
         trackList = new ArrayList<>();
@@ -26,7 +27,19 @@ public class Album {
         return trackList;
     }
 
-    public void setAlbumCover(int albumCoverResInt) {
+    public void setAlbumCoverResInt(int albumCoverResInt) {
         this.albumCoverResInt = albumCoverResInt;
     }
+
+    public int getAlbumCoverResInt() {
+        return albumCoverResInt;
+    }
+
+    public void setBandcampLink(String bandcampLink) {
+        this.bandcampLink = bandcampLink;
+    }
+
+     public String getBandcampLink(){
+        return bandcampLink;
+     }
 }
