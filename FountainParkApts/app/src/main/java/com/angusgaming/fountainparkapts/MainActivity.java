@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         // preparing list data
         prepareListData();
 
-        MediaPlayerUtility mediaPlayerUtility = new MediaPlayerUtility();
+        MediaPlayerUtility mediaPlayerUtility = new MediaPlayerUtility(this);
 
         listAdapter = new ExpandableListAdapter(this, listData, mediaPlayerUtility);
 
@@ -38,12 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void getMusic(){
         sk = new Album();
+        sk.setAlbumCover(R.drawable.sk2_cover);
 
         sk.addTrack(new Track(this, R.raw.one_one));
         sk.addTrack(new Track(this, R.raw.one_two));
         sk.addTrack(new Track(this, R.raw.one_three));
 
         fpa = new Album();
+        fpa.setAlbumCover(R.drawable.fpa_cover);
+
         fpa.addTrack(new Track(this, R.raw.two_one));
         fpa.addTrack(new Track(this, R.raw.two_two));
         fpa.addTrack(new Track(this, R.raw.two_three));
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         fpa.addTrack(new Track(this, R.raw.two_ten));
 
         tmsiym = new Album();
+        tmsiym.setAlbumCover(R.drawable.tmsiym_cover);
         tmsiym.addTrack(new Track(this, R.raw.three_one));
         tmsiym.addTrack(new Track(this, R.raw.three_two));
         tmsiym.addTrack(new Track(this, R.raw.three_three));

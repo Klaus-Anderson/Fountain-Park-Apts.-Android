@@ -10,9 +10,10 @@ import java.util.List;
 public class Album {
 
     private List<Track> trackList;
+    private int albumCoverResInt;
 
     public Album(){
-        trackList = new ArrayList<Track>();
+        trackList = new ArrayList<>();
     };
 
     public void addTrack(Track track){
@@ -25,4 +26,7 @@ public class Album {
         return trackList;
     }
 
+    public void setAlbumCover(int albumCoverResInt) {
+        this.albumCoverResInt = albumCoverResInt;
+    }
 }
