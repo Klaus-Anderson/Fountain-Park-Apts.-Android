@@ -1,5 +1,6 @@
 package com.angusgaming.fountainparkapts;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 
 /**
@@ -7,6 +8,22 @@ import android.media.MediaPlayer;
  */
 
 public class Track {
-    public Track(MediaPlayer mediaPlayer) {
+
+    MediaPlayer mediaPlayer;
+    int mediaPlayerDataSource;
+    Context context;
+
+    public Track(Context context, int mediaPlayerDataSource) {
+        this.context = context;
+        this.mediaPlayerDataSource = mediaPlayerDataSource;
+        this.mediaPlayer = MediaPlayer.create(context, mediaPlayerDataSource);
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public int getMediaPlayerDataSource() {
+        return mediaPlayerDataSource;
     }
 }

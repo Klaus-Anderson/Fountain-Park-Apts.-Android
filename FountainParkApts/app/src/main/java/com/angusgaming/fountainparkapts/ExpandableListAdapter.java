@@ -1,12 +1,15 @@
 package com.angusgaming.fountainparkapts;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import java.io.FileDescriptor;
 import java.util.List;
 
 /**
@@ -43,9 +46,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.track_item, null);
         }
 
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        AssetFileDescriptor afd= context.getResources()
+                .openRawResourceFd(listData.get(groupPosition).getTrackList().get(childPosition).getMediaPlayerDataSource());
+        mmr.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+
+        String songName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+
         TextView txtListChild = convertView.findViewById(R.id.track_name);
 
-        txtListChild.setText(groupPosition + " " + childPosition);
+        txtListChild.setText(songName);
         return convertView;
     }
 
@@ -78,9 +88,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.album_header, null);
         }
 
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        AssetFileDescriptor afd= context.getResources()
+                .openRawResourceFd(listData.get(groupPosition).getTrackList().get(0).getMediaPlayerDataSource());
+        mmr.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+
+        String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
         TextView lblListHeader = convertView
                 .findViewById(R.id.album_track);
-        lblListHeader.setText(groupPosition+"");
+        lblListHeader.setText(albumName);
 
         return convertView;
     }
