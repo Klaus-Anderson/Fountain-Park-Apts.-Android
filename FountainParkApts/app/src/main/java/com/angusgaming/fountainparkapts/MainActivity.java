@@ -1,5 +1,6 @@
 package com.angusgaming.fountainparkapts;
 
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ExpandableListView;
@@ -27,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
         // preparing list data
         prepareListData();
 
-        listAdapter = new ExpandableListAdapter(this, listData);
+        MediaPlayerUtility mediaPlayerUtility = new MediaPlayerUtility();
+
+        listAdapter = new ExpandableListAdapter(this, listData, mediaPlayerUtility);
 
         // setting list adapter
         expListView.setAdapter(listAdapter);

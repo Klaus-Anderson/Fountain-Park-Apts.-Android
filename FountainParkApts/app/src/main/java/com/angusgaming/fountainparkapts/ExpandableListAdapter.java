@@ -3,6 +3,7 @@ package com.angusgaming.fountainparkapts;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<Album> listData;
+    private MediaPlayerUtility mediaPlayerUtility;
 
-    public ExpandableListAdapter(Context context, List<Album> listData) {
+    public ExpandableListAdapter(Context context, List<Album> listData, MediaPlayerUtility mediaPlayerUtility) {
         this.context = context;
         this.listData = listData;
+        this.mediaPlayerUtility = mediaPlayerUtility;
     }
 
     @Override
@@ -51,8 +54,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         txtListChild.setText(songName);
 
-        convertView.setOnClickListener(v -> listData.get(groupPosition).getTrackList()
-                .get(childPosition).getMediaPlayer().start());
+        convertView.setOnClickListener(v -> {
+            MediaPlayer mediaPlayer = listData.get(groupPosition).getTrackList()
+                    .get(childPosition).getMediaPlayer();
+            if (mediaPlayerUtility.isCurrentSong(mediaPlayer) && mediaPlayerUtility.isSongPlaying()) {
+                mediaPlayerUtility.pauseCurrentSong();
+            } else {
+                mediaPlayerUtility.playSong(mediaPlayer);
+            }
+        });
 
         return convertView;
     }
