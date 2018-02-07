@@ -48,21 +48,31 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.track_item, null);
         }
+        Album album = listData.get(groupPosition);
+        Track track =  album.getTrackList().get(childPosition);
 
         String songName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE,
-                listData.get(groupPosition).getTrackList().get(childPosition).getMediaPlayerDataSource());
+                track.getMediaPlayerDataSource());
 
         TextView txtListChild = convertView.findViewById(R.id.track_name);
+        TextView lyricsTextview = convertView.findViewById(R.id.lyrics_textview);
 
         txtListChild.setText(songName);
 
+        if(track.hasLyrics()){
+            lyricsTextview.setVisibility(View.VISIBLE);
+            lyricsTextview.setOnClickListener(v -> {
+                //@todo implement lyrics fragment
+            });
+        } else {
+            lyricsTextview.setVisibility(View.INVISIBLE);
+        }
+
         convertView.setOnClickListener(v -> {
-            Track track = listData.get(groupPosition).getTrackList()
-                    .get(childPosition);
-            if (mediaPlayerUtility.isCurrentSong(track) && mediaPlayerUtility.isSongPlaying()) {
+            if (mediaPlayerUtility.isCurrentSong(track) && mediaPlayerUtility. isSongPlaying()) {
                 mediaPlayerUtility.pauseCurrentSong();
             } else {
-                mediaPlayerUtility.playSong(track, listData.get(groupPosition));
+                mediaPlayerUtility.playSong(track, album);
             }
         });
 
@@ -97,19 +107,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.album_header, null);
         }
+        Album album = listData.get(groupPosition);
 
         TextView albumTitleTextView = convertView.findViewById(R.id.album_title);
         TextView bandCampLink = convertView.findViewById(R.id.bandcamp_link);
         ImageView imageView = convertView.findViewById(R.id.album_cover_imageview);
 
         String albumName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
-                listData.get(groupPosition).getTrackList().get(0).getMediaPlayerDataSource());
+                album.getTrackList().get(0).getMediaPlayerDataSource());
 
         imageView.setImageDrawable(context.getResources().getDrawable(listData.get(groupPosition).getAlbumCoverResInt()));
         albumTitleTextView.setText(albumName);
 
         bandCampLink.setOnClickListener(v -> {
-            String url = listData.get(groupPosition).getBandcampLink();
+            String url = album.getBandcampLink();
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             context.startActivity(i);
