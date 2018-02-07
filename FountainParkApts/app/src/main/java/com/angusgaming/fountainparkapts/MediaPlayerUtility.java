@@ -1,9 +1,12 @@
 package com.angusgaming.fountainparkapts;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 import android.util.Log;
+
+import com.angusgaming.fountainparkapts.fragment.PlayerFragment;
 
 /**
  * Created by Harry Cliff on 2/4/2018.
@@ -12,10 +15,12 @@ import android.util.Log;
 public class MediaPlayerUtility {
 
     private Track currentlyPlayingTrack;
+    private PlayerFragment playerFragment;
     private Context context;
 
-    public MediaPlayerUtility(Context context){
-        this.context =context;
+    public MediaPlayerUtility(Context context, PlayerFragment playerFragment){
+        this.context = context;
+        this.playerFragment = playerFragment;
     }
 
     public void playSong(Track track, Album album){

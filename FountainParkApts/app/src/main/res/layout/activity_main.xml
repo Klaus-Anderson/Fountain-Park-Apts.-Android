@@ -4,17 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.angusgaming.fountainparkapts.MainActivity">
 
     <fragment android:name="com.angusgaming.fountainparkapts.fragment.SongsFragment"
-        android:id="@+id/list"
+        android:id="@+id/songs_fragment_id"
         android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <fragment android:name="com.angusgaming.fountainparkapts.fragment.PlayerFragment"
-        android:id="@+id/viewer"
-        android:layout_weight="2"
-        android:layout_width="0dp"
+        android:id="@+id/player_fragment_id"
+        android:layout_weight="4"
+        android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
 </LinearLayout>
