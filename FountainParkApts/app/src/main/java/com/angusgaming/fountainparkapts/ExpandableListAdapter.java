@@ -19,14 +19,14 @@ import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
+    private MainActivity mainActivity;
     private List<Album> listData;
     private MediaPlayerUtility mediaPlayerUtility;
 
-    public ExpandableListAdapter(Context context, List<Album> listData, MediaPlayerUtility mediaPlayerUtility) {
-        this.context = context;
+    public ExpandableListAdapter(MainActivity mainActivity, List<Album> listData) {
+        this.mainActivity = mainActivity;
         this.listData = listData;
-        this.mediaPlayerUtility = mediaPlayerUtility;
+        this.mediaPlayerUtility = mainActivity.getMediaPlayerUtility();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.context
+            LayoutInflater infalInflater = (LayoutInflater) this.mainActivity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.track_item, null);
         }
@@ -103,7 +103,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) this.context
+            LayoutInflater infalInflater = (LayoutInflater) this.mainActivity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.album_header, null);
         }
@@ -116,14 +116,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         String albumName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
                 album.getTrackList().get(0).getMediaPlayerDataSource());
 
-        imageView.setImageDrawable(context.getResources().getDrawable(listData.get(groupPosition).getAlbumCoverResInt()));
+        imageView.setImageDrawable(mainActivity.getResources().getDrawable(listData.get(groupPosition).getAlbumCoverResInt()));
         albumTitleTextView.setText(albumName);
 
         bandCampLink.setOnClickListener(v -> {
             String url = album.getBandcampLink();
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
-            context.startActivity(i);
+            mainActivity.startActivity(i);
         });
 
         return convertView;

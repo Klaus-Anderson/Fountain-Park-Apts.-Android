@@ -6,9 +6,15 @@
     android:layout_height="match_parent"
     tools:context="com.angusgaming.fountainparkapts.MainActivity">
 
-    <ExpandableListView
-        android:id="@+id/expandable_list_view"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+    <fragment android:name="com.angusgaming.fountainparkapts.fragment.SongsFragment"
+        android:id="@+id/list"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+    <fragment android:name="com.angusgaming.fountainparkapts.fragment.PlayerFragment"
+        android:id="@+id/viewer"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
