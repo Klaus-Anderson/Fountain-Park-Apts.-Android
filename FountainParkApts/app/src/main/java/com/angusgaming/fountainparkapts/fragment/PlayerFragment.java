@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.angusgaming.fountainparkapts.MainActivity;
 import com.angusgaming.fountainparkapts.MediaPlayerUtility;
@@ -18,6 +19,7 @@ import com.angusgaming.fountainparkapts.R;
 
 public class PlayerFragment extends Fragment {
     private ImageView previousButtton, playPauseButton, nextButton;
+    private TextView songName, albumName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,6 +29,8 @@ public class PlayerFragment extends Fragment {
         previousButtton = view.findViewById(R.id.previousButton);
         playPauseButton = view.findViewById(R.id.playButton);
         nextButton = view.findViewById(R.id.nextButton);
+        songName = view.findViewById(R.id.song_name_textview);
+        albumName = view.findViewById(R.id.album_name_textview);
 
         return view;
     }
@@ -58,5 +62,13 @@ public class PlayerFragment extends Fragment {
 
     public ImageView getNextButton() {
         return nextButton;
+    }
+
+    public TextView getSongName() {
+        return songName;
+    }
+
+    public TextView getAlbumName() {
+        return albumName;
     }
 }

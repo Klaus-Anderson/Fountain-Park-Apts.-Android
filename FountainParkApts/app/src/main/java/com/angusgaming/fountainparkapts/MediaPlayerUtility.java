@@ -41,6 +41,11 @@ public class MediaPlayerUtility {
             playerFragment.getPreviousButtton().setVisibility(View.VISIBLE);
             playerFragment.getPlayPauseButton().setImageDrawable(
                     context.getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+
+            playerFragment.getSongName().setText(getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE,
+                    currentlyPlayingTrack.getMediaPlayerDataSource()));
+            playerFragment.getAlbumName().setText(getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
+                    currentlyPlayingTrack.getMediaPlayerDataSource()));
         }
     }
 
@@ -55,6 +60,9 @@ public class MediaPlayerUtility {
             playerFragment.getPreviousButtton().setVisibility(View.INVISIBLE);
             playerFragment.getNextButton().setVisibility(View.INVISIBLE);
             playerFragment.getPlayPauseButton().setVisibility(View.INVISIBLE);
+            playerFragment.getSongName().setText("");
+            playerFragment.getAlbumName().setText("");
+            currentlyPlayingTrack.getMediaPlayer().stop();
             Log.e("FPA", e.getMessage());
         }
     }
@@ -119,6 +127,8 @@ public class MediaPlayerUtility {
                 playerFragment.getPreviousButtton().setVisibility(View.INVISIBLE);
                 playerFragment.getPlayPauseButton().setVisibility(View.INVISIBLE);
                 currentlyPlayingTrack.getMediaPlayer().stop();
+                playerFragment.getSongName().setText("");
+                playerFragment.getAlbumName().setText("");
                 Log.e("FPA", e.getMessage());
             }
         }
@@ -126,6 +136,7 @@ public class MediaPlayerUtility {
 
     public void playNextSong() {
         playNextSong(currentlyPlayingTrack, currentlyPlayingAlbum);
+
     }
 
     public void resumeSong() {
