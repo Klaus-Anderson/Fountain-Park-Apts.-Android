@@ -2,6 +2,7 @@ package com.angusgaming.fountainparkapts;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -47,6 +48,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater infalInflater = (LayoutInflater) this.mainActivity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.track_item, null);
+        }
+        if(groupPosition == 0){
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.red));
+        }
+        if(groupPosition == 1) {
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.green));
+        }
+        if(groupPosition == 2) {
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.yellow));
         }
         Album album = listData.get(groupPosition);
         Track track =  album.getTrackList().get(childPosition);
@@ -106,6 +116,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater infalInflater = (LayoutInflater) this.mainActivity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.album_header, null);
+        }
+
+        if(groupPosition == 0){
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.red));
+        }
+        if(groupPosition == 1) {
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.green));
+        }
+        if(groupPosition == 2) {
+            convertView.setBackgroundColor(mainActivity.getResources().getColor(R.color.yellow));
         }
         Album album = listData.get(groupPosition);
 
