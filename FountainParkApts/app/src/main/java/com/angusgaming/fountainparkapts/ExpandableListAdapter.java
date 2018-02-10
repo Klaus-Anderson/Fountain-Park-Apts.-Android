@@ -2,7 +2,6 @@ package com.angusgaming.fountainparkapts;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -22,12 +21,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private MainActivity mainActivity;
     private List<Album> listData;
-    private MediaPlayerUtility mediaPlayerUtility;
 
     public ExpandableListAdapter(MainActivity mainActivity, List<Album> listData) {
         this.mainActivity = mainActivity;
         this.listData = listData;
-        this.mediaPlayerUtility = mainActivity.getMediaPlayerUtility();
     }
 
     @Override
@@ -61,8 +58,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         Album album = listData.get(groupPosition);
         Track track =  album.getTrackList().get(childPosition);
 
-        String songName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE,
-                track.getMediaPlayerDataSource());
+        String songName = MediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE,
+                track.getMediaPlayerDataSource(), mainActivity);
 
         TextView txtListChild = convertView.findViewById(R.id.track_name);
         TextView lyricsTextview = convertView.findViewById(R.id.lyrics_textview);
@@ -79,11 +76,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         convertView.setOnClickListener(v -> {
-            if (mediaPlayerUtility.isCurrentSong(track) && mediaPlayerUtility. isSongPlaying()) {
-                mediaPlayerUtility.pauseCurrentSong();
-            } else {
-                mediaPlayerUtility.playSong(track, album);
-            }
+            mainActivity.songPicked(groupPosition, childPosition);
         });
 
         return convertView;
@@ -133,8 +126,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView bandCampLink = convertView.findViewById(R.id.bandcamp_link);
         ImageView imageView = convertView.findViewById(R.id.album_cover_imageview);
 
-        String albumName = mediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
-                album.getTrackList().get(0).getMediaPlayerDataSource());
+        String albumName = MediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
+                album.getTrackList().get(0).getMediaPlayerDataSource(), mainActivity);
 
         imageView.setImageDrawable(mainActivity.getResources().getDrawable(listData.get(groupPosition).getAlbumCoverResInt()));
         albumTitleTextView.setText(albumName);
