@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     private ImageView previousButtton, playPauseButton, nextButton;
     private TextView songName, albumName;
 
+    private boolean paused=false, playbackPaused=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,27 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
             if(isPlaying()) pause();
             else start();
         });
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        paused=true;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(paused){
+            setController();
+            paused=false;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        controller.hide();
+        super.onStop();
     }
 
 
@@ -106,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
 
     @Override
     public void pause() {
+        playbackPaused=true;
         musicSrv.pausePlayer();
     }
 
@@ -163,6 +187,11 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     public void songPicked(int album, int song){
         musicSrv.setSong(album, song);
         musicSrv.playSong();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
+        controller.show(0);
     }
 
     @Override
@@ -172,15 +201,21 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         super.onDestroy();
     }
 
-    //play next
     private void playNext(){
         musicSrv.playNext();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
     }
 
-    //play previous
     private void playPrev(){
         musicSrv.playPrev();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
     }
 
