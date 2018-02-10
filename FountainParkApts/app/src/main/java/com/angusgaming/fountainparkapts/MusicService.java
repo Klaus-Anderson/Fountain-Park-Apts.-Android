@@ -33,6 +33,7 @@ public class MusicService extends Service implements
     private int currentAlbum;
     private int currentSong;
     private final IBinder musicBind = new MusicBinder();
+    private MainActivity mainActivity;
 
     public void onCreate(){
         //create the service
@@ -65,6 +66,10 @@ public class MusicService extends Service implements
 
     public void setAlbums(List<Album> albums){
         this.albums = albums;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
     public class MusicBinder extends Binder {
@@ -103,7 +108,6 @@ public class MusicService extends Service implements
     public void onPrepared(MediaPlayer mp) {
         //start playback
         mp.start();
-
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
             Intent notIntent = new Intent(this, MainActivity.class);
@@ -145,6 +149,8 @@ public class MusicService extends Service implements
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
 
+        mainActivity.setSongInfo(playSong);
+
         player.prepareAsync();
     }
 
@@ -185,6 +191,9 @@ public class MusicService extends Service implements
     }
 
     private void stopSong() {
+        player.stop();
+        player.release();
+        mainActivity.stopSong();
     }
 
     //skip to next

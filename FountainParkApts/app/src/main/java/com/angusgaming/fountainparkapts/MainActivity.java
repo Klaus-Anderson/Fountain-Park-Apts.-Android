@@ -4,9 +4,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -21,14 +23,13 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     private Intent playIntent;
     private boolean musicBound=false;
     private List<Album> albumList;
+    private View playerView;
 
-    private MusicController controller;
     private ExpandableListAdapter expandableListAdapter;
 
     private ImageView previousButtton, playPauseButton, nextButton;
     private TextView songName, albumName;
 
-    private boolean paused=false, playbackPaused=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +38,13 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
 
         getMusic();
 
-        setController();
-
         ExpandableListView expandableListView = findViewById(R.id.expandable_list_view);
 
         expandableListAdapter = new ExpandableListAdapter(this, albumList);
 
         expandableListView.setAdapter(expandableListAdapter);
+
+        playerView = findViewById(R.id.player_view);
 
         previousButtton = findViewById(R.id.previousButton);
         playPauseButton = findViewById(R.id.playButton);
@@ -59,28 +60,6 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         });
     }
 
-    @Override
-    protected void onPause(){
-        super.onPause();
-        paused=true;
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(paused){
-            setController();
-            paused=false;
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        controller.hide();
-        super.onStop();
-    }
-
-
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection(){
 
@@ -92,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
             //pass list
             musicSrv.setAlbums(albumList);
             musicBound = true;
+
+            musicSrv.setMainActivity(MainActivity.this);
         }
 
         @Override
@@ -110,27 +91,18 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         }
     }
 
-    private void setController(){
-        //set the controller up
-        controller = new MusicController(this);
-        controller.setPrevNextListeners(
-                v -> playNext(),
-                v -> playPrev());
-
-        controller.setMediaPlayer(this);
-        controller.setAnchorView(findViewById(R.id.player_view));
-        controller.setEnabled(true);
-    }
 
     @Override
     public void start() {
         musicSrv.go();
+        playerView.setVisibility(View.VISIBLE);
+        playPauseButton.setImageResource(R.drawable.ic_pause_black_24dp);
     }
 
     @Override
     public void pause() {
-        playbackPaused=true;
         musicSrv.pausePlayer();
+        playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
     }
 
     @Override
@@ -185,13 +157,10 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     }
 
     public void songPicked(int album, int song){
+        playerView.setVisibility(View.VISIBLE);
+        playPauseButton.setImageResource(R.drawable.ic_pause_black_24dp);
         musicSrv.setSong(album, song);
         musicSrv.playSong();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
     }
 
     @Override
@@ -203,20 +172,10 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
 
     private void playNext(){
         musicSrv.playNext();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
     }
 
     private void playPrev(){
         musicSrv.playPrev();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
     }
 
     private void getMusic(){
@@ -265,5 +224,20 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         albumList.add(sk);
         albumList.add(fpa);
         albumList.add(tmsiym);
+    }
+
+    public void stopSong() {
+        if(playerView!=null) {
+            playerView.setVisibility(View.GONE);
+        }
+    }
+
+    public void setSongInfo(Track playSong) {
+        if(songName != null)
+            songName.setText(MediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_TITLE,
+                    playSong.getMediaPlayerDataSource(), this));
+        if(albumName != null)
+            albumName.setText(MediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
+                    playSong.getMediaPlayerDataSource(), this));
     }
 }
