@@ -1,16 +1,21 @@
 package com.angusgaming.fountainparkapts;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.util.List;
@@ -35,6 +40,9 @@ public class MusicService extends Service implements
     private final IBinder musicBind = new MusicBinder();
     private MainActivity mainActivity;
 
+    private MediaSessionManager mediaSessionManager;
+    private MediaSession mediaSession;
+
     public void onCreate(){
         //create the service
         //create the service
@@ -46,6 +54,21 @@ public class MusicService extends Service implements
         player = new MediaPlayer();
 
         initMusicPlayer();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mediaSession = new MediaSession(this, "MusicService");
+            mediaSession.setCallback(new MediaSessionCallback());
+            mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+            Context context = getApplicationContext();
+            Intent intent = new Intent(context, MainActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(context, 99 /*request code*/,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mediaSession.setSessionActivity(pi);
+
+            Bundle mediaSessionExtras = new Bundle();
+            mediaSession.setExtras(mediaSessionExtras);
+        }
     }
 
     @Override
@@ -114,18 +137,6 @@ public class MusicService extends Service implements
             notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                     notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            Notification.Builder builder = new Notification.Builder(this);
-
-            builder.setContentIntent(pendInt)
-                    .setSmallIcon(R.drawable.fpa_cover)
-                    .setTicker("song title")
-                    .setOngoing(true)
-                    .setContentTitle("Playing")
-                    .setContentText("song title");
-            Notification not = builder.build();
-
-            startForeground(NOTIFY_ID, not);
         }
 
 
@@ -133,7 +144,9 @@ public class MusicService extends Service implements
 
     public void playSong(){
         //play a song
-        player.reset();
+        try {
+            player.reset();
+        } catch (IllegalStateException ise){}
 
         //get song
         Track playSong = albums.get(currentAlbum).getTrackList().get(currentSong);
@@ -150,7 +163,6 @@ public class MusicService extends Service implements
         }
 
         mainActivity.setSongInfo(playSong);
-
         player.prepareAsync();
     }
 
@@ -192,7 +204,6 @@ public class MusicService extends Service implements
 
     private void stopSong() {
         player.stop();
-        player.release();
         mainActivity.stopSong();
     }
 
@@ -201,5 +212,40 @@ public class MusicService extends Service implements
         currentSong++;
         if(currentSong == albums.get(currentAlbum).getTrackList().size()) stopSong();
         else playSong();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private final class MediaSessionCallback extends MediaSession.Callback {
+        @Override
+        public void onPlay() {
+            go();
+        }
+
+        @Override
+        public void onSkipToQueueItem(long queueId) {
+        }
+
+        @Override
+        public void onSeekTo(long position) {
+        }
+
+        @Override
+        public void onPause() {
+            pausePlayer();
+        }
+
+        @Override
+        public void onStop() {
+        }
+
+        @Override
+        public void onSkipToNext() {
+            playNext();
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            playPrev();
+        }
     }
 }

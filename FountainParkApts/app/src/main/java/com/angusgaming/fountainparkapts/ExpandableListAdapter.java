@@ -75,9 +75,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             lyricsTextview.setVisibility(View.INVISIBLE);
         }
 
-        convertView.setOnClickListener(v -> {
-            mainActivity.songPicked(groupPosition, childPosition);
-        });
+        convertView.setOnClickListener(v -> mainActivity.songPicked(groupPosition, childPosition));
 
         return convertView;
     }

@@ -1,27 +1,44 @@
 package com.angusgaming.fountainparkapts;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaDescription;
+import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MediaController.MediaPlayerControl {
+public class MainActivity extends AppCompatActivity implements BroadcastReceiver{
 
+    private static final int NOTIFICATION_ID = 1111;
+    private static final String ACTION_NEXT = "next";
+    private static final String ACTION_PREV = "prev";
+    private static final String ACTION_PLAY = "play";
+    private static final String ACTION_PAUSE = "pause";
     private MusicService musicSrv;
-    private Intent playIntent;
-    private boolean musicBound=false;
+    private Intent playerIntent;
+    private boolean musicBound, started;
     private List<Album> albumList;
     private View playerView;
 
@@ -29,7 +46,51 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
 
     private ImageView previousButtton, playPauseButton, nextButton;
     private TextView songName, albumName;
+    private MediaController mediaController;
+    private MediaMetadata mediaMetadata;
+    private PlaybackState playbackState;
+    private MediaSession mediaSession;
+    private NotificationManager notificationManager;
 
+    private final MediaController.Callback callback = new MediaController.Callback() {
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onPlaybackStateChanged(@NonNull PlaybackState state) {
+            playbackState = state;
+            if (state.getState() == PlaybackState.STATE_STOPPED ||
+                    state.getState() == PlaybackState.STATE_NONE) {
+                stopNotification();
+            } else {
+                Notification notification = createNotification();
+                if (notification != null) {
+                    notificationManager.notify(NOTIFICATION_ID, notification);
+                }
+            }
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onMetadataChanged(MediaMetadata metadata) {
+            mediaMetadata = metadata;
+            Notification notification = createNotification();
+            if (notification != null) {
+                notificationManager.notify(NOTIFICATION_ID, notification);
+            }
+        }
+
+        @Override
+        public void onSessionDestroyed() {
+            super.onSessionDestroyed();
+            updateSessionToken();
+        }
+    };
+
+    private void stopNotification() {
+        notificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    private void updateSessionToken() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
             if(isPlaying()) pause();
             else start();
         });
+
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     //connect to the service
@@ -84,74 +147,62 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     @Override
     protected void onStart() {
         super.onStart();
-        if(playIntent==null){
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
+        if(playerIntent ==null){
+            playerIntent = new Intent(this, MusicService.class);
+            bindService(playerIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playerIntent);
         }
     }
 
-
-    @Override
     public void start() {
         musicSrv.go();
         playerView.setVisibility(View.VISIBLE);
         playPauseButton.setImageResource(R.drawable.ic_pause_black_24dp);
     }
 
-    @Override
     public void pause() {
         musicSrv.pausePlayer();
         playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
     }
 
-    @Override
     public int getDuration() {
         if(musicSrv!=null && musicBound && musicSrv.isPng())
             return musicSrv.getDur();
         else return 0;
     }
 
-    @Override
     public int getCurrentPosition() {
         if(musicSrv!=null && musicBound && musicSrv.isPng())
             return musicSrv.getPosn();
         else return 0;
     }
 
-    @Override
     public void seekTo(int pos) {
 
     }
 
-    @Override
     public boolean isPlaying() {
         if(musicSrv!=null && musicBound)
             return musicSrv.isPng();
         return false;
     }
 
-    @Override
     public int getBufferPercentage() {
         return 0;
     }
 
-    @Override
     public boolean canPause() {
         return true;
     }
 
-    @Override
     public boolean canSeekBackward() {
         return true;
     }
 
-    @Override
     public boolean canSeekForward() {
         return true;
     }
 
-    @Override
     public int getAudioSessionId() {
         return 0;
     }
@@ -161,11 +212,119 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         playPauseButton.setImageResource(R.drawable.ic_pause_black_24dp);
         musicSrv.setSong(album, song);
         musicSrv.playSong();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            createNotifcationCallback();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void createNotifcationCallback() {
+        Notification notification = createNotification();
+        if (notification != null) {
+            mediaController.registerCallback(callback);
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_NEXT);
+            filter.addAction(ACTION_PAUSE);
+            filter.addAction(ACTION_PLAY);
+            filter.addAction(ACTION_PREV);
+            musicSrv.registerReceiver(this, filter);
+
+            musicSrv.startForeground(NOTIFICATION_ID, notification);
+            notificationManager.notify(NOTIFICATION_ID, notification);
+            started = true;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private Notification createNotification() {
+        if (mediaMetadata == null || playbackState == null) {
+            return null;
+        }
+
+        Notification.Builder notificationBuilder = new Notification.Builder(musicSrv);
+        int playPauseButtonPosition = 0;
+
+        // If skip to previous action is enabled
+        if ((playbackState.getActions() & PlaybackState.ACTION_SKIP_TO_PREVIOUS) != 0) {
+            notificationBuilder.addAction(R.drawable.ic_skip_previous_black_24dp,
+                    "previous", previousIntent);
+
+            // If there is a "skip to previous" button, the play/pause button will
+            // be the second one. We need to keep track of it, because the MediaStyle notification
+            // requires to specify the index of the buttons (actions) that should be visible
+            // when in compact view.
+            playPauseButtonPosition = 1;
+        }
+
+        addPlayPauseAction(notificationBuilder);
+
+        // If skip to next action is enabled
+        if ((playbackState.getActions() & PlaybackState.ACTION_SKIP_TO_NEXT) != 0) {
+            notificationBuilder.addAction(R.drawable.ic_skip_next_black_24dp,
+                    "next", nextIntent);
+        }
+
+        MediaDescription mediaDescription = mediaMetadata.getDescription();
+
+        notificationBuilder
+                .setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(new int[]{playPauseButtonPosition})  // show only play/pause in compact view
+                        .setMediaSession(mediaSession.getSessionToken()))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setUsesChronometer(true)
+                .setContentIntent(createPeningIntent(mediaDescription)) // Create an intent that would open the UI when user clicks the notification
+                .setContentTitle(mediaDescription.getTitle())
+                .setContentText(mediaDescription.getSubtitle());
+
+        setNotificationPlaybackState(notificationBuilder);
+
+        return notificationBuilder.build();
+    }
+
+    private PendingIntent createPeningIntent(MediaDescription description) {
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 99 /*request code*/,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return pi;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void addPlayPauseAction(Notification.Builder builder) {
+        String label;
+        int icon;
+        PendingIntent intent;
+        if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
+            label = "pause";
+            icon = R.drawable.ic_pause_black_24dp;
+            intent = pauseIntent;
+        } else {
+            label = "play";
+            icon = R.drawable.ic_play_arrow_black_24dp;
+            intent = playIntent;
+        }
+        builder.addAction(new Notification.Action(icon, label, intent));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setNotificationPlaybackState(Notification.Builder builder) {
+        if (playbackState == null || !started) {
+            musicSrv.stopForeground(true);
+            return;
+        }
+        if (playbackState.getState() == PlaybackState.STATE_PLAYING
+                && playbackState.getPosition() >= 0) {
+            builder.setWhen(System.currentTimeMillis() - playbackState.getPosition()).setShowWhen(true).setUsesChronometer(true);
+        } else {
+            builder.setWhen(0).setShowWhen(false).setUsesChronometer(false);
+        }
+
+        // Make sure that the notification can be dismissed by the user when we are not playing:
+        builder.setOngoing(playbackState.getState() == PlaybackState.STATE_PLAYING);
     }
 
     @Override
     protected void onDestroy() {
-        stopService(playIntent);
+        stopService(playerIntent);
         musicSrv=null;
         super.onDestroy();
     }
@@ -239,5 +398,10 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         if(albumName != null)
             albumName.setText(MediaPlayerUtility.getMetaData(MediaMetadataRetriever.METADATA_KEY_ALBUM,
                     playSong.getMediaPlayerDataSource(), this));
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
     }
 }
