@@ -2,7 +2,6 @@ package com.angusgaming.fountainparkapts;
 
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,12 +9,9 @@ import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.util.List;
@@ -54,21 +50,6 @@ public class MusicService extends Service implements
         player = new MediaPlayer();
 
         initMusicPlayer();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mediaSession = new MediaSession(this, "MusicService");
-            mediaSession.setCallback(new MediaSessionCallback());
-            mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-            Context context = getApplicationContext();
-            Intent intent = new Intent(context, MainActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(context, 99 /*request code*/,
-                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mediaSession.setSessionActivity(pi);
-
-            Bundle mediaSessionExtras = new Bundle();
-            mediaSession.setExtras(mediaSessionExtras);
-        }
     }
 
     @Override
@@ -212,40 +193,5 @@ public class MusicService extends Service implements
         currentSong++;
         if(currentSong == albums.get(currentAlbum).getTrackList().size()) stopSong();
         else playSong();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private final class MediaSessionCallback extends MediaSession.Callback {
-        @Override
-        public void onPlay() {
-            go();
-        }
-
-        @Override
-        public void onSkipToQueueItem(long queueId) {
-        }
-
-        @Override
-        public void onSeekTo(long position) {
-        }
-
-        @Override
-        public void onPause() {
-            pausePlayer();
-        }
-
-        @Override
-        public void onStop() {
-        }
-
-        @Override
-        public void onSkipToNext() {
-            playNext();
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            playPrev();
-        }
     }
 }
