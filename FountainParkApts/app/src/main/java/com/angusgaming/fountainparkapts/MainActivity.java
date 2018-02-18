@@ -454,14 +454,6 @@ public class MainActivity extends AppCompatActivity{
 
     private void getMusic(){
         albumList = new ArrayList<>();
-        Album sk = new Album();
-        sk.setAlbumCoverResInt(R.drawable.sk2_cover);
-        sk.setBandcampLink("https://fountainparkapts.bandcamp.com/album/sk-2");
-
-        sk.addTrack(new Track("one_one"));
-        sk.addTrack(new Track("one_two"));
-        sk.addTrack(new Track("one_three"));
-
         Album fpa = new Album();
         fpa.setAlbumCoverResInt(R.drawable.fpa_cover);
         fpa.setBandcampLink("https://fountainparkapts.bandcamp.com/album/fountain-park-apts");
@@ -495,7 +487,6 @@ public class MainActivity extends AppCompatActivity{
         tmsiym.addTrack(new Track("three_twelve"));
         tmsiym.addTrack(new Track("three_thirteen"));
 
-        albumList.add(sk);
         albumList.add(fpa);
         albumList.add(tmsiym);
     }
